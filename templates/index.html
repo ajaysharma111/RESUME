@@ -1,0 +1,111 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AI Resume Checker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;600;700&display=swap">
+<style>
+:root{--ink:#0f1530;--bg:#f3f5fb;--card:#fff;--tx:#161a2e;--mu:#5d6584;--bd:#e2e6f3;--ac:#6a5cff;--ok:#12b886;--wn:#f59f00;--bad:#f03e3e;--sh:0 14px 34px -16px rgba(30,40,110,.35);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c0f20;--card:#161a34;--tx:#eef0fb;--mu:#a3abcb;--bd:#262c52;--sh:none}}
+:root[data-theme="dark"]{--bg:#0c0f20;--card:#161a34;--tx:#eef0fb;--mu:#a3abcb;--bd:#262c52;--sh:none}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 'Figtree',system-ui,-apple-system,Segoe UI,sans-serif}
+h1,h2,h3{font-family:'Bricolage Grotesque','Figtree',system-ui,sans-serif;margin:0}
+.hero{background:radial-gradient(900px 400px at 85% -10%,#4b3fd8 0,transparent 60%),radial-gradient(700px 380px at 0% 110%,#0f8f7a 0,transparent 55%),var(--ink);color:#fff;padding:60px 20px 120px}
+.hero .in{max-width:1040px;margin:0 auto}
+.hero h1{font-size:clamp(32px,5.4vw,56px);line-height:1.04;letter-spacing:-.025em;font-weight:700;max-width:13em}
+.hero p{max-width:34em;color:#c3c9ee;font-size:18px;margin:16px 0 0}
+.w{max-width:1040px;margin:-74px auto 0;padding:0 16px 64px;position:relative}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:18px;box-shadow:var(--sh)}
+.card h3{font-size:18px;margin-bottom:10px}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;font-weight:700;font-family:'Bricolage Grotesque','Figtree',sans-serif;font-size:18px}
+.hd small{font:500 13px 'Figtree',sans-serif;color:var(--mu)}
+textarea{width:100%;height:280px;resize:vertical;border:1.5px dashed var(--bd);border-radius:12px;padding:14px;background:transparent;color:var(--tx);font:14px/1.55 'Figtree',system-ui,sans-serif;transition:border-color .15s,background .15s}
+textarea:focus{outline:none;border-color:var(--ac);border-style:solid}
+textarea.drag{border-color:var(--ok);background:#12b88614}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:12px 20px;font:700 15px 'Figtree',sans-serif;cursor:pointer;color:#fff;background:linear-gradient(135deg,#6a5cff,#8f5cff);box-shadow:0 8px 20px -8px #6a5cffaa}
+.btn.ghost{background:transparent;color:var(--ac);border:1.5px solid var(--bd);box-shadow:none}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:9px}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:hover:not(:disabled){filter:brightness(1.07)}
+:focus-visible{outline:3px solid #6a5cff88;outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 8px;align-items:center}
+.err{color:var(--bad);font-weight:600;margin:0}
+#out{display:none;margin-top:22px}
+.res{display:grid;grid-template-columns:300px 1fr;gap:16px;margin-bottom:16px}
+.score{text-align:center}.ringw{position:relative;width:190px;margin:4px auto 10px}
+.ring{width:190px;height:190px;transform:rotate(-90deg)}
+.trk,.arc{fill:none;stroke-width:9}.trk{stroke:var(--bd)}.arc{stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1)}
+.num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.num b{font:700 52px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}.num span{color:var(--mu);font-size:13px}
+.vd{color:var(--mu);margin:0}
+.m{margin-bottom:16px}.m:last-child{margin-bottom:0}.m div{display:flex;justify-content:space-between;font-weight:600;margin-bottom:6px}
+.bar{height:10px;background:var(--bd);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;transition:width 1s ease}
+.chip{display:inline-block;padding:3px 11px;margin:3px 4px 3px 0;border-radius:99px;font-size:13px;font-weight:600}
+.chip.y{background:#12b8861f;color:#0b8a65}.chip.n{background:#f03e3e1a;color:#d92c2c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.y{color:#4be0b3}:root:not([data-theme="light"]) .chip.n{color:#ff8787}}
+.lg{list-style:none;padding:0;margin:0}.lg li{padding:8px 12px;margin:6px 0;border-left:4px solid var(--bd);background:var(--bg);border-radius:0 10px 10px 0}
+.lg li.ok{border-color:var(--ok)}.lg li.warn{border-color:var(--wn)}.lg li.bad{border-color:var(--bad)}
+.sub{color:var(--mu);margin:0 0 8px;font-size:14px}.ai{white-space:pre-wrap;min-height:60px}
+@media (max-width:760px){.two,.res{grid-template-columns:1fr}.hero{padding:44px 18px 110px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+
+@media print{.hero,.row,.two:first-of-type{display:none}.w{margin-top:0}}
+.rb{margin:10px 0}.rb div{display:flex;justify-content:space-between;font-weight:600;margin-bottom:5px}
+</style></head><body>
+<header class="hero"><div class="in"><h1>See your resume the way hiring software does</h1><p>Upload a PDF, DOCX or scanned image, add a job post, and get a score, missing keywords, skills and the roles your resume fits best.</p></div></header>
+<main class="w">
+<div class="two">
+<div class="card"><div class="hd">Your resume <small>PDF, Word, ODT, RTF, HTML, TXT or image</small></div><label class="btn ghost sm" style="margin:0 0 10px;cursor:pointer" id="fl">Choose a file<input type="file" id="f" accept=".pdf,.docx,.odt,.txt,.md,.csv,.rtf,.html,.htm,.png,.jpg,.jpeg" hidden></label><textarea id="rs" style="height:230px" aria-label="Resume text" placeholder="...or paste your resume here"></textarea></div>
+<div class="card"><div class="hd">Job description <small>Optional, unlocks the match score</small></div><textarea id="jd" aria-label="Job description" placeholder="Paste the job post you're applying to"></textarea></div>
+</div>
+<div class="row"><button class="btn" id="go">Check my resume</button><p class="err" id="err" role="alert"></p></div>
+<div id="out">
+<div class="res"><div class="card score" id="score"></div><div class="card"><h3>How it scores</h3><div id="mt"></div></div></div>
+<div class="two">
+<div class="card"><h3>Roles you fit</h3><p class="sub">Predicted by a trained TF-IDF + logistic regression model.</p><div id="roles"></div></div>
+<div class="card"><h3>Skills found</h3><div id="sk"></div></div>
+<div class="card"><h3>Keywords</h3><div id="kw"></div></div>
+<div class="card"><h3>Fix these first</h3><ul class="lg" id="ck"></ul></div>
+<div class="card"><h3>Bullet strength</h3><ul class="lg" id="im"></ul></div>
+<div class="card"><h3>Proof check</h3><div id="ev"></div></div>
+<div class="card"><h3>Skill gap roadmap</h3><div id="gap"></div></div>
+<div class="card"><h3>Rewrite these bullets</h3><ul class="lg" id="rw"></ul></div>
+<div class="card"><h3>Red flags (expert rules fired)</h3><ul class="lg" id="fl"></ul></div>
+<div class="card"><h3>Likely interview questions</h3><ul class="lg" id="iq"></ul></div>
+<div class="card"><h3>Explain the score</h3><div id="tr"></div><div id="bl" style="margin-top:12px"></div><button class="btn ghost sm" style="margin-top:12px" onclick="window.print()">Save report as PDF</button></div>
+</div></div></main>
+<script>
+const $=i=>document.getElementById(i);
+const col=s=>s>=75?"var(--ok)":s>=50?"var(--wn)":"var(--bad)";
+const f=$("f");f.onchange=()=>{$("fl").firstChild.textContent=f.files[0]?f.files[0].name+" ":"Choose a file"};
+$("go").onclick=async()=>{
+ const fd=new FormData();fd.append("resume",$("rs").value);fd.append("jd",$("jd").value);
+ if(f.files[0])fd.append("file",f.files[0]);
+ $("err").textContent="";$("go").disabled=true;$("go").textContent="Checking...";
+ let r,d;try{r=await fetch("/analyze",{method:"POST",body:fd});d=await r.json()}catch(e){r={ok:false};d={error:"Could not reach the server. Is app.py running?"}}
+ $("go").disabled=false;$("go").textContent="Check my resume";
+ if(!r.ok){$("err").textContent=d.error;return}
+ const C=339.3,third=d.match===null?"":d.match;
+ const verdict=d.overall>=75?"Strong. Hiring software should rank this well.":d.overall>=50?"Decent. A few fixes will lift it.":"Needs work. Start with the fixes below.";
+ $("score").innerHTML=`<div class="ringw"><svg viewBox="0 0 120 120" class="ring"><circle cx="60" cy="60" r="54" class="trk"/><circle id="arc" cx="60" cy="60" r="54" class="arc" style="stroke:${col(d.overall)}" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg><div class="num"><b>${d.overall}</b><span>out of 100</span></div></div><p class="vd">${verdict}</p>`;
+ const ms=[["ATS format",d.format],["Impact of your bullets",d.impact]];if(d.match!==null)ms.push(["Match to the job",d.match]);
+ const bar=(l,v)=>`<div class="m"><div><span>${l}</span><span style="color:${col(v)}">${v}</span></div><div class="bar" style="display:block"><i data-w="${v}" style="width:0;background:${col(v)}"></i></div></div>`;
+ $("mt").innerHTML=ms.map(m=>bar(m[0],m[1])).join("");
+ $("roles").innerHTML=d.roles.map(x=>`<div class="rb"><div><span>${x.role}</span><span>${x.confidence}%</span></div><div class="bar" style="display:block"><i data-w="${x.confidence}" style="width:0;background:var(--ac)"></i></div></div>`).join("");
+ $("sk").innerHTML=d.skills.map(w=>`<span class="chip y">${w}</span>`).join("")||"<p class='sub'>No known skills detected. Add a skills section.</p>";
+ $("kw").innerHTML=(d.match===null?"<p class='sub'>Add a job description to see missing keywords.</p>":"<p class='sub'>Green is in your resume. Red is in the job post only.</p>")+d.hit.map(w=>`<span class="chip y">${w}</span>`).join("")+d.miss.map(w=>`<span class="chip n">${w}</span>`).join("");
+ $("ck").innerHTML=d.checks.map(c=>`<li class="${c[0]}">${c[1]}</li>`).join("");
+ $("im").innerHTML=d.impact_notes.map(x=>`<li class="ok">${x}</li>`).join("");
+ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ const li=(c,t)=>`<li class="${c}">${t}</li>`;
+ if(d.gain>0)$("score").insertAdjacentHTML("beforeend",`<p class="sub" style="margin-top:10px">Fix the red flags to reach about <b>${Math.min(100,d.overall+d.gain)}</b> (+${d.gain})</p>`);
+ $("ev").innerHTML=`<p class="sub">Proven = used in a project or job bullet. Red = only listed, so an interviewer can challenge it.</p>`+d.proven.map(w=>`<span class="chip y">${esc(w)}</span>`).join("")+d.claimed.map(w=>`<span class="chip n">${esc(w)}</span>`).join("");
+ const g=d.target;
+ $("gap").innerHTML=`<p class="sub">Best fit: <b>${esc(g.role)}</b>, readiness ${g.ready}%</p><div class="bar" style="display:block"><i data-w="${g.ready}" style="width:0;background:${col(g.ready)}"></i></div><ul class="lg" style="margin-top:12px">${g.roadmap.map(x=>li("warn",esc(x))).join("")||li("ok","You cover the core skills for this role.")}</ul>`;
+ $("rw").innerHTML=d.rewrites.map(x=>li("warn",`<s>${esc(x.old)}</s><br><b>Try:</b> ${esc(x.new)}<br><small>${esc(x.issue)}</small>`)).join("")||li("ok","Your bullets look strong.");
+ $("fl").innerHTML=d.flags.map(x=>li("bad",`${esc(x.cond)}. ${esc(x.then)} (+${x.gain})`)).join("")||li("ok","No expert rules fired.");
+ $("iq").innerHTML=d.questions.map(x=>li("ok",esc(x))).join("");
+ $("tr").innerHTML=`<p class="sub">Rule trace (IF-THEN expert system):</p>`+d.trace.map(x=>`<p style="margin:4px 0;font-size:14px">${x.fired?"🔴":"🟢"} <b>${x.id}</b> IF ${esc(x.cond)}</p>`).join("");
+ $("bl").innerHTML=`<details><summary>Blind-screening view (${d.blind.hidden} items hidden)</summary><pre class="ai" style="font-size:12px">${esc(d.blind.text)}</pre></details>`;
+ $("out").style.display="block";$("out").scrollIntoView({behavior:"smooth"});
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{$("arc").style.strokeDashoffset=C*(1-d.overall/100);document.querySelectorAll(".bar i").forEach(b=>b.style.width=b.dataset.w+"%")}));
+};
+</script></body></html>
